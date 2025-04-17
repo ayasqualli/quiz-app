@@ -1,17 +1,12 @@
 <template>
-  <div>
-    <div class="t">
-
-        <Label>//NAME</Label>
-        <button>LOG OUT</button>
-
+  <div class="container">
+    <div class="header">
+      <div class="profile">
+        <img src="public/profile.png" alt="Profile Picture">
+        <label>Name</label>
+      </div>
+      <button class="logout-btn">Log Out</button>
     </div>
-    <div class="t">
-      <router-link class="b2" :to="{name : 'createquiz'}">Create Quiz</router-link>
-      <router-link class="b2" :to="{name : 'Quizzes'}">Quizzes</router-link>
-      <router-link class="b2" :to="{name : 'EditQuiz'}">Edit Quiz</router-link>
-    </div>
-
     <div>
       <label>MY QUIZZES</label>
       <myquizzes />
@@ -29,15 +24,17 @@
   </div>
 </template>
 
-
 <script>
+
 import myquizzes from './components/myquizzes.vue';
 import myscores from './components/myscores.vue';
 import takenQuizzes from './components/takenQuizzes.vue';
 
+
 export default {
-  name: 'Home',
+  name: "Home",
   components: {
+
     myquizzes,
     myscores,
     takenQuizzes
@@ -46,42 +43,55 @@ export default {
 </script>
 
 <style scoped>
-.b1 {
-  background-color: rgb(46, 40, 40);
-  color: white;
-  font-size: 20px;
-  font-weight: bold;
-  padding: 30px;
-}
-
-.b2 {
-  background-color: rgb(224, 177, 65);
-  color: rgb(6, 5, 5);
-  font-size: 20px;
-  font-weight: bold;
-  padding: 30px;
-}
-
-.t {
+.container {
   display: flex;
-  flex-direction: row;
-  gap: 10px;
-  margin-top: 20px;
-  flex-wrap: wrap;
+  flex-direction: column;
+  gap: 20px;
+  padding: 20px;
 }
 
-.tt {
+.header {
   display: flex;
-  flex-direction: row;
-  gap: 10px;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 20px;
 }
 
-.tp {
-  border-radius: 10px;
-  width: 50px;
-  height: 50px;
+.profile {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.profile img {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+}
+
+.quiz-actions {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+}
+
+.quiz-btn {
+  padding: 30px;
+  text-decoration: none;
+  color: inherit;
+  text-align: center;
+}
+
+.quiz-sections {
+  display: flex;
+  gap: 20px;
+  justify-content: space-around;
+}
+
+.section {
+  flex: 1;
+  padding: 20px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  text-align: center;
 }
 </style>

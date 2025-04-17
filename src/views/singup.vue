@@ -56,7 +56,7 @@
   </template>
   
   <script>
-  import { registerWithEmailAndPassword } from "../firebase-config";
+  import { registerWithEmailAndPassword } from "../../../firebase-config";
   import { RouterLink } from "vue-router";
   
   export default {
