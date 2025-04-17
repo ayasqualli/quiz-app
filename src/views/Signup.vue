@@ -60,7 +60,7 @@
   import { RouterLink } from "vue-router";
   
   export default {
-    name: "SignupView",
+    name: "Signup",
     components: {
       RouterLink
     },

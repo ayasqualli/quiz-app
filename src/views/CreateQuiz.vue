@@ -63,7 +63,7 @@
 
 
 export default {
-  name: 'Createquiz',
+  name: 'createquiz',
   components: {
    
   }

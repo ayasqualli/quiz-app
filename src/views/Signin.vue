@@ -33,7 +33,7 @@
   import { loginWithEmailAndPassword } from "../firebase-config";
   
   export default {
-    name: 'LoginView',
+    name: 'Signin',
     data() {
       return {
         email: '',

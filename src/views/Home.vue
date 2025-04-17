@@ -12,35 +12,35 @@
       <router-link class="b2" :to="{name : 'EditQuiz'}">Edit Quiz</router-link>
     </div>
 
-    <div class="t">
-      <label>MY SCORES</label>
-      <Myscores />
-    </div>
-
     <div>
       <label>MY QUIZZES</label>
-      <Myquizzes />
+      <myquizzes />
     </div>
 
     <div>
       <label>TAKEN QUIZZES</label>
-      <TakenQuizes />
+      <takenQuizzes />
+    </div>
+
+    <div class="t">
+      <label>MY SCORES</label>
+      <myscores />
     </div>
   </div>
 </template>
 
 
 <script>
-import Myquizzes from './components/myquizzes.vue';
-import Myscores from './components/myscores.vue';
-import TakenQuizzes from './components/takenQuizzes.vue';
+import myquizzes from './components/myquizzes.vue';
+import myscores from './components/myscores.vue';
+import takenQuizzes from './components/takenQuizzes.vue';
 
 export default {
   name: 'Home',
   components: {
-    Myquizzes,
-    Myscores,
-    TakenQuizzes
+    myquizzes,
+    myscores,
+    takenQuizzes
   }
 }
 </script>
