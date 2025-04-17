@@ -5,7 +5,7 @@
   </template>
   
   <script>
-  import { db } from '../firebaseconfig';
+  import { db } from '../firebase-config';
   import { onSnapshot, collection } from 'firebase/firestore';
   import { getAuth } from 'firebase/auth';
   

@@ -45,8 +45,8 @@
     </div>
   </template>
   
-<script>
 
+<script>
   import { registerWithEmailAndPassword, db } from "../firebase-config";
   import { doc, setDoc } from "firebase/firestore";
   import { RouterLink } from "vue-router";
