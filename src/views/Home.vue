@@ -32,15 +32,15 @@
 </template>
 
 <script>
-import Myquizzes from './components/myquizzes.vue';
-import Myscores from './components/myscores.vue';
+import MyQuizzes from '@/components/MyQuizzes.vue';
+import MyScores from '@/components/MyScores.vue';
 import TakenQuizzes from './takenQuizzes.vue';
 
 export default {
   name: "Home",
   components: {
-    Myquizzes,
-    Myscores,
+    MyQuizzes,
+    MyScores,
     TakenQuizzes
   }
 }

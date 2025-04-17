@@ -56,7 +56,7 @@
   </template>
   
   <script>
-  import { registerWithEmailAndPassword } from "../firebase-config";
+  import firebaseConfig from '@/firebase/firebase-config';
   import { RouterLink } from "vue-router";
   
   export default {
@@ -104,7 +104,7 @@
         if (!this.validateForm()) return;
         
         try {
-          await registerWithEmailAndPassword(this.email, this.password);
+          await firebaseConfig.registerWithEmailAndPassword(this.email, this.password);
           alert('Registration successful!');
           this.$router.push('/login');
         } catch (error) {
