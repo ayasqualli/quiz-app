@@ -56,7 +56,7 @@
   </template>
   
   <script>
-  import firebaseConfig from '@/firebase/firebase-config';
+  import firebaseConfig from '../firebase-config';
   import { RouterLink } from "vue-router";
   
   export default {

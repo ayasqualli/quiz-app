@@ -10,7 +10,7 @@
   </template>
 
 <script>
-import { db, auth } from '../firebase';
+import { db, auth } from '../firebase-config';
 import { collection, getDocs } from 'firebase/firestore';
 
 export default {
