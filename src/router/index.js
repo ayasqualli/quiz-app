@@ -5,10 +5,9 @@ import myquizzes from '@/components/myquizzes.vue';
 import TakeQuiz from '../views/TakeQuiz.vue';
 import EditQuiz from '../views/EditQuiz.vue';
 import Results from '../views/Results.vue';
-import Signup from '../views/Singup.vue';
+import Signup from '../views/Signup.vue';
 import Signin from '../views/Signin.vue';
 import Quizzes from '../views/Quizzes.vue';
-import Signup from '@/views/Signup.vue';
 
 const routes = [
   { path: '/', name: 'Home', component: Home },
