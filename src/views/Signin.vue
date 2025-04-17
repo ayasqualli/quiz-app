@@ -30,7 +30,7 @@
   </template>
   
   <script>
-  import { loginWithEmailAndPassword } from "../firebase-config";
+  import { loginWithEmailAndPassword } from "../../../firebase-config";
   
   export default {
     name: 'LoginView',

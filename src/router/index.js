@@ -5,8 +5,8 @@ import myquizzes from "@/components/myquizzes.vue";
 import TakeQuiz from "../views/TakeQuiz.vue";
 import EditQuiz from "../views/EditQuiz.vue";
 import Results from "../views/Results.vue";
-import singup from "../views/Singup.vue";
-import signin from "../views/Signin.vue";
+import singup from "../views/Signup.vue";
+import signin from "../views/signin.vue";
 import Quizzes from "../views/Quizzes.vue";
 
 const routes = [
