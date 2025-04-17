@@ -30,32 +30,50 @@
   </template>
   
   <script>
-  import { loginWithEmailAndPassword } from "../firebase-config";
   
-  export default {
-    name: 'LoginView',
-    data() {
-      return {
-        email: '',
-        password: '',
+import { loginWithEmailAndPassword } from "../firebase-config";
+import {auth, db} from "../firebase-config";
+import { doc, getDoc } from "firebase/firestore"; // make sure you imported these at the top
+
+export default {
+  name: 'LoginView',
+  data() {
+    return {
+      email: '',
+      password: '',
+    }
+  },
+  methods: {
+    async loginUser() {
+      console.log('Attempting to login with email:', this.email);
+      try {
+         await loginWithEmailAndPassword(this.email, this.password);
+        const userDocRef = doc(db, "users", auth.currentUser.uid);
+        const userDocSnap = await getDoc(userDocRef);
+
+        if (userDocSnap.exists()) {
+          console.log("Login successful, user:", userDocSnap.data().username);
+        } else {
+          console.log("No such user document found.");
+        }
+
+        this.$router.push("/Profile");
+      } catch (error) {
+        console.error('Login error:', error);
+        if (error.code === "auth/wrong-password") {
+          console.warn('Wrong password detected');
+          alert("Wrong password. Redirecting to reset page...");
+          this.$router.push("/Forgot");
+        } else if (error.code === "auth/user-not-found") {
+          console.warn('User not found');
+          alert("User not found.");
+        } else {
+          console.error('Unexpected error:', error);
+          alert("Error: " + error.message);
+        }
       }
     },
-    methods: {
-      async loginUser() {
-        try {
-          await loginWithEmailAndPassword(this.email, this.password);
-          this.$router.push("/Profile");
-        } catch (error) {
-          if (error.code === "auth/wrong-password") {
-            alert("Wrong password. Redirecting to reset page...");
-            this.$router.push("/Forgot");
-          } else if (error.code === "auth/user-not-found") {
-            alert("User not found.");
-          } else {
-            alert("Error: " + error.message);
-          }
-        }
-      },
-    },
-  }
-  </script>
+  },
+}
+</script>
+
