@@ -30,7 +30,6 @@
   </template>
   
   <script>
-  
 import { loginWithEmailAndPassword } from "../firebase-config";
 import {auth, db} from "../firebase-config";
 import { doc, getDoc } from "firebase/firestore"; // make sure you imported these at the top

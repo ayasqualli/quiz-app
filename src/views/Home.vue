@@ -7,41 +7,37 @@
       </div>
       <button class="logout-btn">Log Out</button>
     </div>
-
-    <div class="quiz-actions">
-      <router-link class="quiz-btn" :to="{name: 'createquiz'}">Create Quiz</router-link>
-      <router-link class="quiz-btn" :to="{name: 'Quizzes'}">Quizzes</router-link>
-      <router-link class="quiz-btn" :to="{name: 'EditQuiz'}">Edit Quiz</router-link>
+    <div>
+      <label>MY QUIZZES</label>
+      <myquizzes />
     </div>
 
-    <div class="quiz-sections">
-      <div class="section">
-        <label>MY SCORES</label>
-        <Myscores />
-      </div>
-      <div class="section">
-        <label>MY QUIZZES</label>
-        <Myquizzes />
-      </div>
-      <div class="section">
-        <label>TAKEN QUIZZES</label>
-        <TakenQuizzes />
-      </div>
+    <div>
+      <label>TAKEN QUIZZES</label>
+      <takenQuizzes />
+    </div>
+
+    <div class="t">
+      <label>MY SCORES</label>
+      <myscores />
     </div>
   </div>
 </template>
 
 <script>
-import Myquizzes from './components/myquizzes.vue';
-import Myscores from './components/myscores.vue';
-import TakenQuizzes from './takenQuizzes.vue';
+
+import myquizzes from './components/myquizzes.vue';
+import myscores from './components/myscores.vue';
+import takenQuizzes from './components/takenQuizzes.vue';
+
 
 export default {
   name: "Home",
   components: {
-    Myquizzes,
-    Myscores,
-    TakenQuizzes
+
+    myquizzes,
+    myscores,
+    takenQuizzes
   }
 }
 </script>

@@ -13,13 +13,7 @@ import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, Go
 
 // Your web app's Firebase configuration
 const firebaseConfig = {
-  apiKey: "AIzaSyAv6LDNrYO63P3cp0MbK89JDt5A_o7D-oY",
-  authDomain: "forum-app-f6240.firebaseapp.com",
-  projectId: "forum-app-f6240",
-  storageBucket: "forum-app-f6240.firebasestorage.app",
-  messagingSenderId: "215047096908",
-  appId: "1:215047096908:web:1a35a6332e1a1855acc2e9",
-  measurementId: "G-W7DBFQXLRZ"
+  
 };
 
 // Initialize Firebase
@@ -29,6 +23,9 @@ const analytics = getAnalytics(app);
 const auth = getAuth(app);
 const googleProvider = new GoogleAuthProvider();
 
+const getCurrentUserId = () => {
+  return auth.currentUser ? auth.currentUser.uid : null;
+};
 
 // Function for email/password registration
 const registerWithEmailAndPassword = async (email, password, username) => {
@@ -99,6 +96,8 @@ const confirmReset = async (oobCode, newPassword) => {
 export {
   db,
   auth,
+  googleProvider,
+  getCurrentUserId,
   registerWithEmailAndPassword,
   loginWithEmailAndPassword,
   signInWithGoogle,
