@@ -4,7 +4,7 @@ import Home from "../views/Home.vue";
 const routes = [
   {
     path: "/",
-    name: Home,
+    name: "Home",
     component: Home,
   },
 ];
@@ -14,4 +14,4 @@ const router = createRouter({
   routes,
 });
 
-export default router
+export default router;
