@@ -28,17 +28,6 @@
               <input type="email" v-model="email" required />
             </div>
   
-            <div class="form-group">
-              <label>PROFILE PICTURE</label>
-              <input type="file" @change="handleImageUpload" accept="image/*" />
-              <img
-                v-if="profilePicture"
-                :src="profilePicture"
-                alt="Preview"
-                class="image-preview"
-              />
-            </div>
-  
             <div class="terms">
               <input type="checkbox" v-model="agreeToTerms" required />
               <label>I read and agree to <span>Terms & Conditions</span></label>
@@ -48,6 +37,7 @@
           </form>
         </div>
       </div>
+      <div>Sign up with : <img src="/google.jpeg" width="250" length="250" @click="signInWithGoogle" /></div>
       <div class="login-prompt">
         Already have an account?
         <RouterLink to="/login">Sign in</RouterLink>
@@ -55,10 +45,12 @@
     </div>
   </template>
   
-  <script>
-  import firebaseConfig from '@/firebase/firebase-config';
+<script>
+
+  import { registerWithEmailAndPassword, db } from "../firebase-config";
+  import { doc, setDoc } from "firebase/firestore";
   import { RouterLink } from "vue-router";
-  
+
   export default {
     name: "Signup",
     components: {
@@ -69,26 +61,11 @@
         name: "",
         username: "",
         email: "",
-        profilePicture: "",
         password: "",
-        agreeToTerms: false,
+        agreeToTerms: false
       };
     },
     methods: {
-      handleImageUpload(event) {
-        const file = event.target.files[0];
-        if (file) {
-          if (!file.type.startsWith('image/')) {
-            alert('Please upload an image file');
-            return;
-          }
-          const reader = new FileReader();
-          reader.onload = (e) => {
-            this.profilePicture = e.target.result;
-          };
-          reader.readAsDataURL(file);
-        }
-      },
       validateForm() {
         if (!this.name || !this.username || !this.email || !this.password) {
           alert('Please fill in all required fields');
@@ -102,19 +79,30 @@
       },
       async submitForm() {
         if (!this.validateForm()) return;
-        
+
         try {
-          await firebaseConfig.registerWithEmailAndPassword(this.email, this.password);
+          // Create user in Firebase Auth
+          const user = await registerWithEmailAndPassword(this.email, this.password, this.username);
+
+          // Create Firestore user document
+          await setDoc(doc(db, "users", user.uid), {
+            name: this.name,
+            username: this.username,
+            email: this.email,
+            createdAt: new Date(),
+          });
+
           alert('Registration successful!');
           this.$router.push('/login');
+
         } catch (error) {
           alert('Registration failed: ' + error.message);
         }
-      },
-    },
+      }
+    }
   };
-  </script>
-  
+</script>
+
   <style scoped>
   .bigbro {
     overflow: hidden;
