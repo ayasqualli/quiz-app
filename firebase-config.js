@@ -1,6 +1,7 @@
 // Import the functions you need from the SDKs you need
 import { initializeApp } from "firebase/app";
 import { getAnalytics } from "firebase/analytics";
+import { getStorage } from "firebase/storage";
 import { getFirestore } from "firebase/firestore";
 import {
   sendPasswordResetEmail,
@@ -8,7 +9,7 @@ import {
   confirmPasswordReset,
 } from "firebase/auth";
 
-import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, GoogleAuthProvider, signInWithPopup } from "firebase/auth";
+import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, GoogleAuthProvider, signInWithPopup, updateProfile , setPersistence, browserSessionPersistence  } from "firebase/auth";
 
 // Your web app's Firebase configuration
 const firebaseConfig = {
@@ -28,15 +29,22 @@ const analytics = getAnalytics(app);
 const auth = getAuth(app);
 const googleProvider = new GoogleAuthProvider();
 
+
 // Function for email/password registration
-const registerWithEmailAndPassword = async (email, password) => {
-    if (!email || !password) {
-      console.error("Email and password must be provided.");
-      throw new Error("Email and password are required.");
+const registerWithEmailAndPassword = async (email, password, username) => {
+    if (!email || !password ||!username) {
+      console.error("Email, password and username must be provided.");
+      throw new Error("All fields are required.");
     }
     try {
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-      return userCredential.user;
+      const user = userCredential.user;
+
+      await updateProfile(user, {
+        displayName: username,
+      });
+      console.log("User registered with display name:", user.displayName);
+      return user;
     } catch (error) {
       console.error("Error registering user:", error);
       throw error;
@@ -50,6 +58,7 @@ const loginWithEmailAndPassword = async (email, password) => {
       throw new Error("Email and password are required.");
     }
     try {
+      await setPersistence(auth, browserSessionPersistence);
       const userCredential = await signInWithEmailAndPassword(auth, email, password);
       return userCredential.user;
     } catch (error) {
