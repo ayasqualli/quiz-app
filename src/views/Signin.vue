@@ -43,36 +43,25 @@
     methods: {
       async loginUser() {
         try {
+          console.log('Attempting to login with email:', this.email);
           await loginWithEmailAndPassword(this.email, this.password);
+          console.log('Login successful, redirecting to profile');
           this.$router.push("/Profile");
         } catch (error) {
+          console.error('Login error:', error);
           if (error.code === "auth/wrong-password") {
+            console.warn('Wrong password detected');
             alert("Wrong password. Redirecting to reset page...");
             this.$router.push("/Forgot");
           } else if (error.code === "auth/user-not-found") {
+            console.warn('User not found');
             alert("User not found.");
           } else {
+            console.error('Unexpected error:', error);
             alert("Error: " + error.message);
           }
         }
-
-        this.$router.push("/Profile");
-      } catch (error) {
-        console.error('Login error:', error);
-        if (error.code === "auth/wrong-password") {
-          console.warn('Wrong password detected');
-          alert("Wrong password. Redirecting to reset page...");
-          this.$router.push("/Forgot");
-        } else if (error.code === "auth/user-not-found") {
-          console.warn('User not found');
-          alert("User not found.");
-        } else {
-          console.error('Unexpected error:', error);
-          alert("Error: " + error.message);
-        }
       }
-    },
-  },
-}
+    }
+  }
 </script>
-
