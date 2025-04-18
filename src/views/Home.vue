@@ -26,9 +26,9 @@
 
 <script>
 
-import myquizzes from './components/myquizzes.vue';
-import myscores from './components/myscores.vue';
-import takenQuizzes from './components/takenQuizzes.vue';
+import myquizzes from '../components/myquizzes.vue';
+import myscores from '../components/myscores.vue';
+import takenQuizzes from '../components/takenQuizzes.vue';
 
 
 export default {
