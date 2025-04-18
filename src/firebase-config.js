@@ -1,8 +1,8 @@
 // Import the functions you need from the SDKs you need
 import { initializeApp } from "firebase/app";
 import { getAnalytics } from "firebase/analytics";
-import { getFirestore } from "firebase/firestore"
-import { sendPasswordResetEmail, verifyPasswordReserCode, verifyPassworReset, getAuth, createUserWithEmailAndPassword, signInWithmailAndPassword, GoogleAuthProvider, signIWithPopup } from "firebase/auth";
+import { getFirestore, doc, setDoc } from "firebase/firestore"
+import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, GoogleAuthProvider, signInWithPopup, sendPasswordResetEmail } from "firebase/auth";
 
 const firebaseConfig = {
   apiKey: "AIzaSyBUoOm7Eu2tWkK2UzpuoPnXZX3wFHfhQiY",
@@ -19,4 +19,73 @@ const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const auth = getAuth(app);
 const analytics = getAnalytics(app);
-const googleProvier = new GoogleAuthProvider();
+const googleProvider = new GoogleAuthProvider();
+
+const registerWithEmailAndPassword = async (email, password) => {
+  if (!email || !password) {
+    console.error("Email and password must be provided.");
+    throw new Error("Email and password are required.");
+  }
+  try {
+    const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+    return userCredential.user;
+  } catch (error) {
+    console.error("Error registering user:", error);
+    throw error;
+  }
+};
+
+// Function for email/password login
+const loginWithEmailAndPassword = async (email, password) => {
+  if (!email || !password) {
+    console.error("Email and password must be provided.");
+    throw new Error("Email and password are required.");
+  }
+  try {
+    const userCredential = await signInWithEmailAndPassword(auth, email, password);
+    return userCredential.user;
+  } catch (error) {
+    console.error("Error logging in:", error);
+    throw error;
+  }
+};
+
+// Function for Google sign-in
+const signInWithGoogle = async () => {
+  try {
+    const result = await signInWithPopup(auth, googleProvider);
+    return result.user;
+  } catch (error) {
+    console.error("Error signing in with Google:", error);
+    throw error;
+  }
+};
+const sendPasswordReset = async (email) => {
+try {
+  await sendPasswordResetEmail(auth, email);
+  alert("Password reset email sent. Please check your inbox.");
+} catch (error) {
+  console.error("Error sending password reset email:", error.message);
+  throw error;
+}
+};
+
+// Verifies the token in reset email
+const verifyResetCode = async (oobCode) => {
+return await verifyPasswordResetCode(auth, oobCode);
+};
+
+// Updates the password
+const confirmReset = async (oobCode, newPassword) => {
+return await confirmPasswordReset(auth, oobCode, newPassword);
+};
+export {
+db,
+auth,
+registerWithEmailAndPassword,
+loginWithEmailAndPassword,
+signInWithGoogle,
+sendPasswordReset,
+verifyResetCode,
+confirmReset
+};
