@@ -98,7 +98,7 @@ export default {
       }
       try {
         const quizRef = await this.fetchQuestions(apiURL);
-        this.$router.push({ name: 'Quiz', params: { id: quizRef.id } });
+        this.$router.push({ name: 'take-quiz', params: { id: quizRef.id } });
       } catch (error) {
         console.error("Error in submitForm:", error);
         alert("An error occurred while creating the quiz. Please try again.");
