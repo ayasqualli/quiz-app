@@ -1,36 +1,39 @@
 <template>
+  <div>
+    <h3>Taken Quizzes</h3>
+    <div v-if="takenQuizzes.length === 0">You haven't taken any quizzes yet.</div>
     <ul>
-      <li v-for="quiz in takenQuizzes" :key="quiz.id">{{ quiz.title }}</li>
+      <li v-for="quiz in takenQuizzes" :key="quiz.id">
+        {{ quiz.title }}
+      </li>
     </ul>
-  </template>
-  
-  <script>
-  import { db } from '../firebase-config';
-  import { onSnapshot, collection } from 'firebase/firestore';
-  import { getAuth } from 'firebase/auth';
-  
-  export default {
-    data() {
-      return {
-        takenQuizzes: []
-      };
-    },
-    created() {
-      const auth = getAuth();
-      const user = auth.currentUser;
-  
-      const unsubscribe = onSnapshot(collection(db, "quizzes"), (snapshot) => {
-        const quizzes = [];
-        snapshot.forEach((doc) => {
-          const data = doc.data();
-          const hasTaken = data.scores?.some(score => score.userId === user.uid);
-          if (hasTaken) {
-            quizzes.push({ id: doc.id, ...data });
-          }
-        });
-        this.takenQuizzes = quizzes;
-      });
-    }
-  };
-  </script>
+  </div>
+</template>
 
+<script>
+import { db } from '../firebase-config';
+import { collection, getDocs } from 'firebase/firestore';
+import { getAuth } from 'firebase/auth';
+
+export default {
+  name: 'takenQuizzes',
+  data() {
+    return {
+      takenQuizzes: []
+    };
+  },
+  async mounted() {
+    const auth = getAuth();
+    const user = auth.currentUser;
+    if (!user) return;
+
+    const querySnapshot = await getDocs(collection(db, 'quizzes'));
+
+    this.takenQuizzes = querySnapshot.docs
+      .map(doc => ({ id: doc.id, ...doc.data() }))
+      .filter(quiz =>
+        quiz.scores?.some(score => score.userId === user.uid)
+      );
+  }
+};
+</script>

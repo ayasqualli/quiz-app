@@ -2,51 +2,69 @@
   <div class="container">
     <div class="header">
       <div class="profile">
-        <img src="public/profile.png" alt="Profile Picture">
-        <label>Name</label>
+        <img src="/profile.png" alt="Profile Picture" />
+        <label>{{ username || 'Name' }}</label>
       </div>
-      <button class="logout-btn">Log Out</button>
+      <button class="logout-btn" @click="logout">Log Out</button>
     </div>
+
     <div>
-      <label>MY QUIZZES</label>
+      <h3>MY QUIZZES</h3>
       <myquizzes />
     </div>
 
     <div>
-      <label>TAKEN QUIZZES</label>
+      <h3>TAKEN QUIZZES</h3>
       <takenQuizzes />
     </div>
 
-    <div class="t">
-      <label>MY SCORES</label>
+    <div>
+      <h3>MY SCORES</h3>
       <myscores />
     </div>
   </div>
 </template>
 
 <script>
-
-import myquizzes from '../components/myquizzes.vue';
-import myscores from '../components/myscores.vue';
-import takenQuizzes from '../components/takenQuizzes.vue';
-
+import myquizzes from './components/myquizzes.vue';
+import myscores from './components/myscores.vue';
+import takenQuizzes from './components/takenQuizzes.vue';
+import { getAuth, signOut } from 'firebase/auth';
 
 export default {
-  name: "Home",
+  name: 'Home',
   components: {
-
     myquizzes,
     myscores,
     takenQuizzes
+  },
+  data() {
+    return {
+      username: ''
+    };
+  },
+  mounted() {
+    const user = getAuth().currentUser;
+    if (user) {
+      this.username = user.displayName || user.email;
+    }
+  },
+  methods: {
+    logout() {
+      const auth = getAuth();
+      signOut(auth).then(() => {
+        this.$router.push('/');
+      });
+    }
   }
-}
+};
 </script>
 
 <style scoped>
 .container {
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 30px;
   padding: 20px;
 }
 
@@ -68,30 +86,18 @@ export default {
   border-radius: 50%;
 }
 
-.quiz-actions {
-  display: flex;
-  gap: 10px;
-  justify-content: center;
+.logout-btn {
+  padding: 10px 15px;
+  background-color: #e74c3c;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: bold;
 }
 
-.quiz-btn {
-  padding: 30px;
-  text-decoration: none;
-  color: inherit;
-  text-align: center;
-}
-
-.quiz-sections {
-  display: flex;
-  gap: 20px;
-  justify-content: space-around;
-}
-
-.section {
-  flex: 1;
-  padding: 20px;
-  border: 1px solid #ccc;
-  border-radius: 5px;
-  text-align: center;
+h3 {
+  margin-bottom: 10px;
+  color: #2c3e50;
 }
 </style>
