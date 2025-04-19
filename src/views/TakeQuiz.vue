@@ -1,9 +1,9 @@
 <template>
   <div class="quiz-app">
     <div class="home">
-      <button class="regenerate-btn" @click="$router.push('/create-quiz')">
+      <button class="regenerate-btn" @click="$router.push('/')">
         <i class="fa fa-home"></i>
-        <p>Regenerate Questions</p>
+        <p>Back to home</p>
       </button>
     </div>
 
