@@ -1,6 +1,6 @@
 <template>
-    <div class="bigbro">
-      <div class="page-container"></div>
+  <div class="bigbro">
+    <div class="page-container">
       <div class="flexy">
         <div class="form-container">
           <form @submit.prevent="loginUser" class="form">
@@ -27,52 +27,146 @@
         </div>
       </div>
     </div>
-  </template>
-  
-  <script>
+  </div>
+</template>
+
+<script>
 import { loginWithEmailAndPassword } from "../firebase-config";
-import {auth, db} from "../firebase-config";
-import { doc, getDoc } from "firebase/firestore"; // make sure you imported these at the top
 
 export default {
-  name: 'LoginView',
+  name: 'Signin',
   data() {
     return {
       email: '',
       password: '',
-    }
+    };
   },
   methods: {
     async loginUser() {
-      console.log('Attempting to login with email:', this.email);
       try {
-         await loginWithEmailAndPassword(this.email, this.password);
-        const userDocRef = doc(db, "users", auth.currentUser.uid);
-        const userDocSnap = await getDoc(userDocRef);
-
-        if (userDocSnap.exists()) {
-          console.log("Login successful, user:", userDocSnap.data().username);
-        } else {
-          console.log("No such user document found.");
-        }
-
+        await loginWithEmailAndPassword(this.email, this.password);
         this.$router.push("/Profile");
       } catch (error) {
         console.error('Login error:', error);
         if (error.code === "auth/wrong-password") {
-          console.warn('Wrong password detected');
           alert("Wrong password. Redirecting to reset page...");
           this.$router.push("/Forgot");
         } else if (error.code === "auth/user-not-found") {
-          console.warn('User not found');
           alert("User not found.");
         } else {
-          console.error('Unexpected error:', error);
           alert("Error: " + error.message);
         }
       }
-    },
-  },
-}
+    }
+  }
+};
 </script>
 
+<style scoped>
+.bigbro {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background-color: #fdf6f0; /* soft cream */
+}
+
+.page-container {
+  width: 100%;
+  max-width: 400px;
+}
+
+.flexy {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.form-container {
+  background-color: #fffaf5; /* very light peach */
+  padding: 30px;
+  border-radius: 10px;
+  box-shadow: 0 4px 20px rgba(202, 164, 114, 0.2); /* soft golden-brown shadow */
+  width: 100%;
+}
+
+.title h1 {
+  margin-bottom: 20px;
+  text-align: center;
+  font-size: 28px;
+  color: #8b5e3c; /* rich chestnut brown */
+  font-family: 'Georgia', serif;
+}
+
+.form-group {
+  margin-bottom: 20px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 6px;
+  font-weight: bold;
+  color: #9a6d45; /* warm brown */
+}
+
+.form-group input {
+  width: 95%;
+  padding: 10px 14px;
+  border: 1px solid #d4b197; /* soft tan */
+  border-radius: 6px;
+  font-size: 16px;
+  background-color: #fffefc; /* almost white */
+  color: #5a3d2b; /* darker text */
+}
+
+button[type="submit"] {
+  width: 100%;
+  background-color: #e8a87c; /* warm muted orange */
+  color: white;
+  padding: 12px;
+  border: none;
+  border-radius: 6px;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+  margin-top: 10px;
+  transition: background-color 0.3s;
+}
+
+button[type="submit"]:hover {
+  background-color: #d08b66; /* slightly deeper orange */
+}
+
+.signup-prompt {
+  margin-top: 15px;
+  text-align: center;
+}
+
+.signup-text {
+  font-size: 14px;
+  color: #7d5a44; /* medium soft brown */
+}
+
+.signup-link {
+  margin-left: 5px;
+  color: #ba6c4f; /* soft reddish-brown */
+  text-decoration: none;
+}
+
+.signup-link:hover {
+  text-decoration: underline;
+}
+
+.forgot-password {
+  display: block;
+  text-align: center;
+  margin-top: 12px;
+  font-size: 14px;
+  color: #b2765e; /* dusty rose */
+  text-decoration: none;
+}
+
+.forgot-password:hover {
+  text-decoration: underline;
+}
+</style>

@@ -23,8 +23,10 @@ export default {
   async mounted() {
     const user = auth.currentUser;
     if (!user) return;
+
     const q = query(collection(db, 'quizzes'), where('ownerId', '==', user.uid));
     const querySnapshot = await getDocs(q);
+
     this.quizzes = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
   },
   methods: {
