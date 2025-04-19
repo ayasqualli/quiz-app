@@ -9,16 +9,7 @@
           v-for="quiz in quizzes" :key="quiz.id">
           <h2>{{ quiz.title }}</h2>
           <p><strong>Author:</strong> {{ quiz.author }}</p>
-          <p><strong>Topic:</strong> {{ quiz.topic }}</p>
-          <div class="mt-2">
-            <h3 class="font-medium">Questions:</h3>
-            <ul class="list-disc pl-6">
-              <li v-for="(q, i) in quiz.questions" :key="i">
-                {{ q.type === 'qcm' ? '[QCM]' : '[T/F]' }} {{ q.text }}  
-                <br/>
-              </li>
-            </ul>
-          </div>
+          <p><strong>Category:</strong> {{ quiz.category }}</p>
           <router-link :to="`/take-quiz/${quiz.id}`">
             <button>Take Quiz</button>
           </router-link>

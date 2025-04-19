@@ -8,6 +8,7 @@ import Results from '../views/Results.vue';
 import Signup from '../views/Signup.vue';
 import Signin from '../views/Signin.vue';
 import Quizzes from '../views/Quizzes.vue';
+import Profile from '../views/Profile.vue';
 
 const routes = [
   { path: '/', name: 'Signin', component: Signin },
@@ -19,6 +20,7 @@ const routes = [
   {path: '/signup', name:'Signup',component: Signup},
   {path: '/Home', name:'Home',component: Home},
   {path: '/quizzes', name:'Quizzes',component: Quizzes},
+  {path: '/Profile', name:'Profile',component: Profile}
 ];
 
 const router = createRouter({

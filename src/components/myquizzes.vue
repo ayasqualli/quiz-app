@@ -3,7 +3,7 @@
     <div v-if="quizzes.length === 0">You haven't created any quizzes yet.</div>
     <div v-for="quiz in quizzes" :key="quiz.id">
       <h4>{{ quiz.title }}</h4>
-      <p>Topic: {{ quiz.topic }}</p>
+      <p>Topic: {{ quiz.category }}</p>
       <button @click="goToEditQuiz(quiz.id)">Edit</button>
     </div>
   </div>

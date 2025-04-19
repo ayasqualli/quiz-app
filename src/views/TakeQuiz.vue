@@ -1,9 +1,6 @@
 <template>
   <div class="quiz-app">
     <header>
-      <div class="logo">
-        <img src="@/assets/logo.png" alt="logo" />
-      </div>
       <div class="page-name">Quiz Mania</div>
       <div class="home">
         <router-link to="/create-quiz">
