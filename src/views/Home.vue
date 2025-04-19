@@ -7,6 +7,11 @@
       </div>
       <button class="logout-btn" @click="logout">Log Out</button>
     </div>
+    <div>
+      <router-link :to="CreatzQuiz">CREATE QUIZ</router-link>
+      <router-link :to="Quizzes">QUIZZES</router-link>
+      <router-link :to="EditQuiz">EDIT QUIZ</router-link>
+    </div>
 
     <div>
       <h3>MY QUIZZES</h3>
@@ -26,9 +31,9 @@
 </template>
 
 <script>
-import myquizzes from './components/myquizzes.vue';
-import myscores from './components/myscores.vue';
-import takenQuizzes from './components/takenQuizzes.vue';
+import myquizzes from '../components/myquizzes.vue';
+import myscores from '../components/myscores.vue';
+import takenQuizzes from '../components/takenQuizzes.vue';
 import { getAuth, signOut } from 'firebase/auth';
 
 export default {

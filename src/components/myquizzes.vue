@@ -1,12 +1,11 @@
 <template>
   <div>
-    <h3>My Quizzes</h3>
     <div v-if="quizzes.length === 0">You haven't created any quizzes yet.</div>
-    <ul>
-      <li v-for="quiz in quizzes" :key="quiz.id">
-        {{ quiz.title }}
-      </li>
-    </ul>
+    <div v-for="quiz in quizzes" :key="quiz.id">
+      <h4>{{ quiz.title }}</h4>
+      <p>Topic: {{ quiz.topic }}</p>
+      <button @click="goToEditQuiz(quiz.id)">Edit</button>
+    </div>
   </div>
 </template>
 
@@ -15,7 +14,7 @@ import { db, auth } from '../firebase-config';
 import { collection, query, where, getDocs } from 'firebase/firestore';
 
 export default {
-  name: 'myquizzes',
+  name: 'MyQuizzes',
   data() {
     return {
       quizzes: []
@@ -29,6 +28,11 @@ export default {
     const querySnapshot = await getDocs(q);
 
     this.quizzes = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+  },
+  methods: {
+    goToEditQuiz(quizId) {
+      this.$router.push({ name: 'EditQuiz', params: { quizId } });
+    }
   }
 };
 </script>
