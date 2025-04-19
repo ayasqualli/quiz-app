@@ -2,7 +2,7 @@
   <div class="container">
     <div class="header">
       <div class="profile">
-        <img src="/profile.png" alt="Profile Picture" />
+        <router-link :to="Profile"><img src="/profile.png" alt="Profile Picture" /></router-link>
         <label>{{ username || 'Name' }}</label>
       </div>
       <button class="logout-btn" @click="logout">Log Out</button>
