@@ -2,7 +2,7 @@
 import { initializeApp } from "firebase/app";
 import { getAnalytics } from "firebase/analytics";
 import { getFirestore, doc, setDoc } from "firebase/firestore"
-import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, GoogleAuthProvider, signInWithPopup, sendPasswordResetEmail } from "firebase/auth";
+import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, GoogleAuthProvider, signInWithPopup, updateProfile , setPersistence, browserSessionPersistence, sendPasswordResetEmail } from "firebase/auth";
 
 const firebaseConfig = {
   apiKey: "AIzaSyBUoOm7Eu2tWkK2UzpuoPnXZX3wFHfhQiY",
@@ -28,9 +28,33 @@ const registerWithEmailAndPassword = async (email, password) => {
   }
   try {
     const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-    return userCredential.user;
+    const user = userCredential.user;
+
+    await updateProfile(user, {
+      displayName: username,
+    });
+    console.log("User registered with display name:", user.displayName);
+    return user;
   } catch (error) {
     console.error("Error registering user:", error);
+    throw error;
+  }
+};
+
+setPersistence(auth, browserSessionPersistence)
+  .then(() => {
+    console.log("Auth persistence set to session");
+  })
+  .catch((error) => {
+    console.error("Error setting auth persistence:", error);
+  });
+
+const sendPasswordReset = async (email) => {
+  try {
+    await sendPasswordResetEmail(auth, email);
+    alert("Password reset email sent. Please check your inbox.");
+  } catch (error) {
+    console.error("Error sending password reset email:", error.message);
     throw error;
   }
 };
@@ -60,15 +84,7 @@ const signInWithGoogle = async () => {
     throw error;
   }
 };
-const sendPasswordReset = async (email) => {
-try {
-  await sendPasswordResetEmail(auth, email);
-  alert("Password reset email sent. Please check your inbox.");
-} catch (error) {
-  console.error("Error sending password reset email:", error.message);
-  throw error;
-}
-};
+
 
 // Verifies the token in reset email
 const verifyResetCode = async (oobCode) => {
