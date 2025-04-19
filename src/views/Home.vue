@@ -26,9 +26,9 @@
 </template>
 
 <script>
-import myquizzes from './components/myquizzes.vue';
-import myscores from './components/myscores.vue';
-import takenQuizzes from './components/takenQuizzes.vue';
+import myquizzes from '../components/myquizzes.vue';
+import myscores from '../components/myscores.vue';
+import takenQuizzes from '../components/takenQuizzes.vue';
 import { getAuth, signOut } from 'firebase/auth';
 
 export default {
