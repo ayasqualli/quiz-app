@@ -66,43 +66,85 @@ export default {
 </script>
 
 <style scoped>
+
 .container {
   display: flex;
   flex-direction: column;
   gap: 30px;
   padding: 20px;
+  background-color: #fffaf3; /* Soft cream background */
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  min-height: 100vh;
 }
 
 .header {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  background-color: #f5e6d7; /* Warm beige */
+  padding: 15px 20px;
+  border-radius: 10px;
+  box-shadow: 0 4px 12px rgba(166, 122, 81, 0.2);
 }
 
 .profile {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
 }
 
 .profile img {
-  width: 40px;
-  height: 40px;
+  width: 45px;
+  height: 45px;
   border-radius: 50%;
+  border: 2px solid #e1a95f;
+  background-color: #fff;
+}
+
+.profile label {
+  font-size: 16px;
+  font-weight: bold;
+  color: #6e4b3a;
 }
 
 .logout-btn {
-  padding: 10px 15px;
-  background-color: #e74c3c;
+  padding: 10px 18px;
+  background-color: #d2691e; /* Autumn orange */
   color: white;
   border: none;
-  border-radius: 6px;
+  border-radius: 8px;
   cursor: pointer;
   font-weight: bold;
+  transition: background-color 0.3s;
+}
+
+.logout-btn:hover {
+  background-color: #a34700;
+}
+
+.router-link-active,
+a {
+  display: inline-block;
+  margin: 5px 10px;
+  padding: 10px 16px;
+  background-color: #f4c784; /* Soft pumpkin */
+  color: #4a2e1e;
+  text-decoration: none;
+  font-weight: 500;
+  border-radius: 6px;
+  transition: background-color 0.3s;
+}
+
+a:hover {
+  background-color: #e3ac56;
 }
 
 h3 {
   margin-bottom: 10px;
-  color: #2c3e50;
+  font-size: 20px;
+  color: #7b4f34;
+  border-bottom: 2px solid #e3ac56;
+  padding-bottom: 4px;
+  width: fit-content;
 }
 </style>
