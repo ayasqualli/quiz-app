@@ -1,6 +1,5 @@
 <template>
   <div>
-    <h3>My Scores & Leaderboards</h3>
     <div v-if="quizzes.length === 0">You have no scores yet.</div>
     <div v-for="quiz in quizzes" :key="quiz.id" class="score-card">
       <h4>{{ quiz.title }}</h4>

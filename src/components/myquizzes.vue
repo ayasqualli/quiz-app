@@ -1,6 +1,5 @@
 <template>
   <div>
-    <h3>My Quizzes</h3>
     <div v-if="quizzes.length === 0">You haven't created any quizzes yet.</div>
     <ul>
       <li v-for="quiz in quizzes" :key="quiz.id">

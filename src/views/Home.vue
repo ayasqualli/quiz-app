@@ -7,6 +7,11 @@
       </div>
       <button class="logout-btn" @click="logout">Log Out</button>
     </div>
+    <div>
+      <router-link :to="CreatzQuiz">CREATE QUIZ</router-link>
+      <router-link :to="Quizzes">QUIZZES</router-link>
+      <router-link :to="EditQuiz">EDIT QUIZ</router-link>
+    </div>
 
     <div>
       <h3>MY QUIZZES</h3>
