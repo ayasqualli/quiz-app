@@ -161,21 +161,26 @@ export default {
         if (data.response_code === 0 && data.results.length > 0) {
           const auth = getAuth();
           const user = auth.currentUser;
-          const author = user ? user.displayName || 'Anonymous' : 'Anonymous';
+          
+          if (user) {
+            const username = user.displayName || user.email;
 
-          const quizRef = await addDoc(collection(db, "quizzes"), {
-            title: this.formData.title,
-            author: author,
-            scores: this.formData.scores || [],
-            questions: data.results,
-            createdAt: new Date(),
-            category: this.formData.category,
-            difficulty: this.formData.difficulty,
-            type: this.formData.type,
-            questionCount: this.formData.questions
-          });
-          console.log("Quiz stored with ID: ", quizRef.id);
-          return quizRef;
+            const quizRef = await addDoc(collection(db, "quizzes"), {
+              title: this.formData.title,
+              author: username,
+              scores: this.formData.scores || [],
+              questions: data.results,
+              createdAt: new Date(),
+              category: this.formData.category,
+              difficulty: this.formData.difficulty,
+              type: this.formData.type,
+              questionCount: this.formData.questions
+            });
+            console.log("Quiz stored with ID: ", quizRef.id);
+            return quizRef;
+          } else {
+            throw new Error("User not authenticated");
+          }
         } else {
           throw new Error("No results returned from the API");
         }
