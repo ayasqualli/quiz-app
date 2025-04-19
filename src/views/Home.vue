@@ -2,15 +2,15 @@
   <div class="container">
     <div class="header">
       <div class="profile">
-        <router-link :to="Profile"><img src="/profile.png" alt="Profile Picture" /></router-link>
+        <router-link to="/Profile"><img src="/profile.png" alt="Profile Picture" /></router-link>
         <label>{{ username || 'Name' }}</label>
       </div>
       <button class="logout-btn" @click="logout">Log Out</button>
     </div>
     <div>
-      <router-link :to="CreatzQuiz">CREATE QUIZ</router-link>
-      <router-link :to="Quizzes">QUIZZES</router-link>
-      <router-link :to="EditQuiz">EDIT QUIZ</router-link>
+      <router-link to="/create-quiz">CREATE QUIZ</router-link>
+      <router-link to="/myquizzes">QUIZZES</router-link>
+      <router-link to="/edit-quiz/{{quizRef.id}}">EDIT QUIZ</router-link>
     </div>
 
     <div>
