@@ -1,14 +1,11 @@
 <template>
   <div class="quiz-app">
-    <header>
-      <div class="page-name">Quiz Mania</div>
-      <div class="home">
-        <router-link to="/create-quiz">
-          <i class="fa fa-home"></i>
-          <p>Regenerate Questions</p>
-        </router-link>
-      </div>
-    </header>
+    <div class="home">
+      <button class="regenerate-btn" @click="$router.push('/')">
+        <i class="fa fa-home"></i>
+        <p>Back to home</p>
+      </button>
+    </div>
 
     <main class="main">
       <div v-if="loading" class="loading">Loading questions...</div>
@@ -26,7 +23,7 @@
           <div v-for="(question, index) in questions" :key="index" class="question" ref="questionRefs">
             <div class="score-bar">
               <div id="number"><span>Question {{ index + 1 }}</span></div>
-              <div id="timer">Time: <span>{{ timeLeft }}</span></div>
+              <div id="timer" v-if="index === currentQuestionIndex">Time: <span>{{ timeLeft }}</span></div>
             </div>
             <div class="properties">
               <p>Type: <span>{{ question.type }}</span></p>
@@ -35,49 +32,35 @@
             </div>
             <h2>{{ question.question }}</h2>
             <div class="options">
-              <div v-for="(answer, i) in getAllAnswers(question)" :key="i">
-                <input 
-                  type="radio" 
-                  :name="'question' + index" 
-                  :id="'option-' + index + '-' + i" 
-                  :value="answer"
-                  v-model="userAnswers[index]"
-                  :disabled="timeLeft <= 0"
-                />
-                <label 
-                  :class="['option', {
-                    'correct': showResults && answer === question.correct_answer,
-                    'incorrect': showResults && userAnswers[index] === answer && answer !== question.correct_answer
-                  }]" 
-                  :for="'option-' + index + '-' + i"
-                >
-                  {{ answer }}
-                </label>
+              <div 
+                v-for="(answer, i) in getAllAnswers(question)" 
+                :key="i" 
+                :class="['option', {
+                  'selected': userAnswers[index] === answer,
+                  'correct': showResults && answer === question.correct_answer,
+                  'incorrect': showResults && userAnswers[index] === answer && answer !== question.correct_answer
+                }]"
+                @click="selectAnswer(index, answer)"
+                :disabled="timeLeft <= 0 && index === currentQuestionIndex"
+              >
+                {{ answer }}
               </div>
             </div>
-            <button class="next" @click="nextQuestion(index)" :disabled="!userAnswers[index]">
+            <button class="next" @click="nextQuestion(index)">
               Next <i class="fa fa-arrow-right"></i>
             </button>
           </div>
         </div>
-        <button v-if="showResults" class="submit-quiz" @click="scrollToResults">Submit Quiz</button>
+        <button v-if="!showResults" class="next" @click="submitQuiz">Submit Quiz</button>
       </div>
     </main>
-
-    <footer>
-      <a href="https://github.com/ayasqualli/quizz-app">Source code Repository</a>
-      <p>SPD2-S4</p>
-      <p>
-        Questions generated from
-        <span><a href="https://opentdb.com/api_config.php">Open Trivia DB</a></span>
-      </p>
-    </footer>
   </div>
 </template>
 
 <script>
 import { db } from '../firebase-config';
-import { collection, getDocs, getDoc, doc } from 'firebase/firestore';
+import { collection, getDocs, getDoc, doc, updateDoc, arrayUnion } from 'firebase/firestore';
+import { getAuth } from 'firebase/auth';
 
 export default {
   name: "TakeQuiz",
@@ -90,7 +73,8 @@ export default {
       timer: null,
       score: 0,
       showResults: false,
-      loading: true
+      loading: true,
+      username: ''
     };
   },
   methods: {
@@ -106,11 +90,15 @@ export default {
         const quizDoc = await getDoc(doc(db, 'quizzes', quizId));
         if (quizDoc.exists()) {
           this.questions = quizDoc.data().questions;
+          this.questions.forEach(question => {
+            question.answers = this.shuffleAnswers([
+              ...question.incorrect_answers,
+              question.correct_answer
+            ]);
+          });
           console.log('Fetched questions:', this.questions);
           this.loading = false;
-          if (this.questions.length > 0) {
-            this.startTimer();
-          }
+          this.startTimer();
         } else {
           console.error('Quiz document not found');
           this.loading = false;
@@ -120,8 +108,42 @@ export default {
         this.loading = false;
       }
     },
+    async saveScore() {
+      try {
+        const auth = getAuth();
+        const user = auth.currentUser;
+        if (user) {
+          this.username = user.displayName || user.email;
+          const quizId = this.$route.params.id;
+          const quizRef = doc(db, 'quizzes', quizId);
+          
+          await updateDoc(quizRef, {
+            scores: arrayUnion({
+              username: this.username,
+              score: this.score,
+              timestamp: new Date()
+            })
+          });
+          console.log('Score saved successfully');
+        }
+      } catch (error) {
+        console.error('Error saving score:', error);
+      }
+    },
+    shuffleAnswers(answers) {
+      for (let i = answers.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [answers[i], answers[j]] = [answers[j], answers[i]];
+      }
+      return answers;
+    },
     getAllAnswers(question) {
-      return [...question.incorrect_answers, question.correct_answer];
+      return question.answers || [...question.incorrect_answers, question.correct_answer];
+    },
+    selectAnswer(index, answer) {
+      if (this.timeLeft > 0 || index !== this.currentQuestionIndex) {
+        this.userAnswers[index] = answer;
+      }
     },
     startTimer() {
       this.timeLeft = 30;
@@ -139,11 +161,15 @@ export default {
         this.currentQuestionIndex = index + 1;
         this.scrollToQuestion(this.currentQuestionIndex);
         this.startTimer();
-      } else {
-        this.calculateScore();
-        this.showResults = true;
-        this.scrollToResults();
       }
+    },
+    async submitQuiz() {
+      this.calculateScore();
+      await this.saveScore();
+      this.showResults = true;
+      this.$nextTick(() => {
+        this.scrollToResults();
+      });
     },
     calculateScore() {
       this.score = this.questions.reduce((acc, question, index) => {
@@ -172,284 +198,205 @@ export default {
     clearInterval(this.timer);
   }
 };
+
+async function getQuizScores(quizId) {
+  try {
+    const quizDoc = await getDoc(doc(db, 'quizzes', quizId));
+    if (quizDoc.exists()) {
+      const scores = quizDoc.data().scores;
+      console.log('Quiz scores:', scores);
+      return scores;
+    } else {
+      console.error('Quiz document not found');
+      return null;
+    }
+  } catch (error) {
+    console.error('Error fetching quiz scores:', error);
+    return null;
+  }
+}
 </script>
 
 <style scoped>
-body {
-    font-family: 'Poppins', sans-serif;
-    background: linear-gradient(-45deg, #f8ebd8, #d5b1f9 ,#6a5acd, #632382);
-	background-size: 400% 400%;
-	animation: gradient 15s ease infinite;
-    margin: 0;
-    padding: 0;
+.quiz-app {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background-color: #fff5f0;
+  color: #333;
 }
 
-header{
-    height: 100px;
-    display: flex;
-    width: 100%;
-    justify-content: space-between;
-    background: #f8ebd8;
-    position: sticky;
-    top: 0;
-    z-index: 1000;
-    padding: 0;
-    margin: 0;
-    box-shadow: 0 2px 10px rgba(99, 35, 130, 0.1);
-    transition: box-shadow 0.3s ease;
+header {
+  background-color: #f3e2d6;
+  padding: 20px 0;
+  text-align: center;
+  border-bottom: 2px solid #e0c9b2;
 }
 
-/* Sticky Header scroll effect */
-header.scrolled {
-    box-shadow: 0 4px 20px rgba(99, 35, 130, 0.2);
+h1 {
+  margin: 0;
+  font-size: 2.2em;
+  color: #8b5e3c;
 }
 
-.page-name{
-    font-size: 50px;
-    display: flex;
-    justify-content: center; 
-    align-items: center;
-    font-family: 'Montserrat', sans-serif;
-    font-weight: 600;
-    color: #632382;
-    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
-    transition: color 0.3s ease;
+.main {
+  flex: 1;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
-
-header img{
-    width: 150px;
-    height: auto;
-    margin-left: 30px;
-}
-
-footer{
-    display: flex;
-    flex-direction: column; 
-    align-items: center;
-    justify-content: center;
-    color: #f8ebd8;
-    background-color: #383e4e;
-}
-
-footer {
-    margin-top: auto;
-    width: 100%;
-    padding: 20px 0;
-}
-
-
-footer a {
-    color:#d5b1f9; 
-    text-decoration: none; 
-    transition: color 0.3s ease, text-shadow 0.3s ease;
-}
-
-footer a:hover {
-    color: #632382;
-    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
-    margin: 5px;
-}
-
-footer p {
-    margin: 2px;
-}
-
-header p {
-    margin: auto;
-    font-size: 16px;
-    color: #d5b1f9;
-    text-align: center;
-}
-
-.home a {
-    display: flex;
-    margin-top: 30px;
-    margin-right: 20px;
-    align-items: center;
-    color: #d5b1f9;
-    text-decoration: none;
-    transition: color 0.3s ease, transform 0.3s ease;
-}
-
-.home a:hover, .home p:hover {
-    color: #632382;
-    transform: scale(1.05);
-}
-
-.home i {
-    margin-right: 8px;
-    font-size: 20px;
+.quiz-container {
+  width: 100%;
+  max-width: 850px;
+  background-color: #ffffff;
+  padding: 30px;
+  border-radius: 16px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+  margin: 20px 0;
 }
 
 .question {
-    width: 80%;
-    margin:2% 10%;
-    padding: 32px;
-    background: rgba(255, 255, 255, 0.9);
-    border-radius: 15px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-}
-
-.question-container {
-    padding: 32px;
-    width: 80%;
-    margin: 32px auto;
-    height: 100vh;
+  margin-bottom: 40px;
+  padding: 20px;
+  border-radius: 10px;
+  background-color: #fffaf5;
 }
 
 .question h2 {
-    font-family: 'Montserrat', sans-serif;
-    font-weight: 500;
-    color: #632382;
-    font-size: 24px;
-    margin-bottom: 24px;
-    text-align: center;
-}
-
-.options {
-    display: grid;
-    gap: 16px;
-    grid-template-columns: repeat(2, 1fr);
-}
-
-.option {
-    font-family: 'Poppins', sans-serif;
-    font-weight: 400;
-    background: #f8ebd8;
-    border: 2px solid #d5b1f9;
-    border-radius: 10px;
-    padding: 16px;
-    font-size: 16px;
-    cursor: pointer;
-    transition: all 0.3s ease;
-}
-
-.option:hover {
-    background: #d5b1f9;
-    color: white;
-    transform: translateY(-2px);
-}
-.option:active {
-    background: #aa58fd;
-    color: white;
-    transform: translateY(-2px);
-}
-
-input[type="radio"] {
-    display: none;
-}
-
-input[type="radio"]:checked + label {
-    background: #aa58fd;
-    color: white;
-    transform: translateY(-2px);
-    transition: none;
+  font-size: 1.5em;
+  color: #d08b66;
+  margin-bottom: 20px;
 }
 
 .score-bar {
-    display: flex;
-    justify-content: space-between;
-    margin-bottom: 16px;
-    font-weight: bold;
-    color: #632382;
-    width: 100%;
-    padding: 0 8px;
-}
-
-#score {
-    text-align: left;
-}
-
-#timer {
-    text-align: right;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  padding: 10px;
+  background-color: #f3e2d6;
+  border-radius: 8px;
 }
 
 .properties {
-    display: flex;
-    justify-content: space-around;
-    margin-bottom: 32px;
-    padding: 16px;
-    background: #f8ebd8;
-    border-radius: 10px;
+  display: flex;
+  gap: 15px;
+  margin-bottom: 20px;
+  font-size: 0.9em;
+  color: #8b5e3c;
 }
 
 .properties p {
-    margin: 0;
-    color: #632382;
+  margin: 0;
+  padding: 5px 10px;
+  background-color: #ffe4d4;
+  border-radius: 5px;
 }
 
-.next {
-    display: block;
-    margin: 24px auto 0;
-    display: block;
-    margin-left: auto;
-    background: #632382;
-    color: white;
-    border: none;
-    padding: 16px 32px;
-    border-radius: 10px;
-    cursor: pointer;
-    font-size: 18px;
-    transition: all 0.3s ease;
+.options {
+  display: grid;
+  gap: 16px;
+  grid-template-columns: 1fr;
+  margin: 20px 0;
 }
 
-.next:hover {
-    background: #6a5acd;
-    transform: translateY(-2px);
+@media (min-width: 600px) {
+  .options {
+    grid-template-columns: repeat(2, 1fr);
+  }
 }
 
-
-.option.correct{
-    background: green !important;
-    border-color: rgb(1, 82, 1);
-    color: white;
+.option {
+  background-color: #ffe4d4;
+  padding: 12px 20px;
+  border-radius: 10px;
+  transition: background-color 0.3s ease;
+  font-size: 1.05em;
+  cursor: pointer;
 }
 
-.option.incorrect{
-    background: red !important ;
-    border-color: rgb(211, 2, 2);
-    color: white;
+.option:hover {
+  background-color: #fdd8c4;
 }
 
-.generate-message{
-    color: #f8ebd8;
-    text-align: center;
-    font-size: 30px;
-    font-weight: 500;
-    height: 75vh;
+.option.selected {
+  background-color: #e8a87c;
+  color: white;
 }
 
-.results {
-    background: rgba(255, 255, 255, 0.9);
-    border-radius: 10px;
-    padding: 20px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-    text-align: center;
+.correct {
+  background-color: #d4edda !important;
+  border: 1px solid #c3e6cb;
+  color: #155724;
 }
 
-.results h2 {
-    color: #632382;
-    font-size: 2em;
-    margin-bottom: 20px;
+.incorrect {
+  background-color: #f8d7da !important;
+  border: 1px solid #f5c6cb;
+  color: #721c24;
 }
 
-.score-summary {
-    font-size: 1.5em;
-    color: #6a5acd;
+input[disabled] + label {
+  opacity: 0.6;
+  cursor: not-allowed;
 }
 
-.restart-quiz {
-    background: #632382;
-    color: white;
-    border: none;
-    padding: 10px 20px;
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 1.2em;
+button {
+  background-color: #e8a87c;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 10px;
+  font-size: 1em;
+  cursor: pointer;
+  transition: background-color 0.3s;
 }
 
-.restart-quiz:hover {
-    background: #6a5acd;
+button:hover {
+  background-color: #d08b66;
 }
+
+.score {
+  font-size: 1.4em;
+  font-weight: bold;
+  color: #8b5e3c;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+footer {
+  text-align: center;
+  padding: 20px;
+  background-color: #f3e2d6;
+  color: #8b5e3c;
+  font-size: 0.9em;
+  border-top: 2px solid #e0c9b2;
+}
+
+footer a {
+  color: #8b5e3c;
+  text-decoration: underline;
+}
+
+footer a:hover {
+  color: #d08b66;
+}
+
+.loading {
+  font-size: 1.4em;
+  color: #8b5e3c;
+  text-align: center;
+  margin-top: 50px;
+}
+
+.question-divider {
+  border: none;
+  height: 1px;
+  background: #e0c9b2;
+  margin: 40px 0;
+}
+
 </style>
