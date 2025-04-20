@@ -39,25 +39,10 @@
           </div>
         </div>
       </div>
-
-      <!-- Sticky Bottom Section -->
-      <div class="bottom-section">
-        <div class="google-signin">
-          Sign up with :
-          <img
-            src="/google.jpeg"
-            width="40"
-            height="40"
-            alt="Sign in with Google"
-            @click="mysignInWithGoogle"
-            class="clickable-icon"
-          />
-        </div>
         <div class="login-prompt">
           Already have an account?
           <RouterLink to="/" style="color: #8b5e3c;">Sign in</RouterLink>
         </div>
-      </div>
     </div>
   </div>
 </template>
@@ -65,7 +50,7 @@
   
 
 <script>
-  import { registerWithEmailAndPassword, db, signInWithGoogle } from "../firebase-config";
+  import { registerWithEmailAndPassword, db } from "../firebase-config";
   import { doc, setDoc } from "firebase/firestore";
   import { RouterLink } from "vue-router";
 
@@ -95,22 +80,13 @@
         }
         return true;
       },
-      async mysignInWithGoogle() {
-        try {
-          const result = await signInWithGoogle();
-          console.log("Google Sign-in successful:", result);
-          this.$router.push("/Home"); // or wherever you want to go
-        } catch (error) {
-          console.error("Google Sign-in error:", error);
-          alert("Google Sign-in failed: " + error.message);
-        }
-      },
+      
       async submitForm() {
         if (!this.validateForm()) return;
 
         try {
           // Create user in Firebase Auth
-          const user = await registerWithEmailAndPassword(this.email, this.password);
+          const user = await registerWithEmailAndPassword(this.email, this.password,this.username);
 
           // Create Firestore user document
           await setDoc(doc(db, "users", user.uid), {
@@ -230,7 +206,6 @@ button[type="submit"]:hover {
   flex-direction: column;
   justify-content: space-between;
   align-items: center;        
-  height: 100vh;
   width: 100%;
   max-width: 400px;           
   padding: 20px 0;           
@@ -241,15 +216,4 @@ button[type="submit"]:hover {
   margin-bottom: 20px;
 }
 
-.google-signin {
-  margin-bottom: 10px;
-  font-size: 14px;
-  color: #7d5a44;
-}
-
-.clickable-icon {
-  cursor: pointer;
-  vertical-align: middle;
-  margin-left: 10px;
-}
 </style>

@@ -9,24 +9,26 @@
     </div>
     <div>
       <router-link to="/create-quiz">CREATE QUIZ</router-link>
-      <router-link to="/myquizzes">QUIZZES</router-link>
-      <router-link to="/edit-quiz/{{quizRef.id}}">EDIT QUIZ</router-link>
+      <router-link to="/quizzes">QUIZZES</router-link>
     </div>
 
-    <div>
+    <div style="display:flex; flex-direction:row; gap:20px; justify-content:space-between;">
+      <div>
       <h3>MY QUIZZES</h3>
       <myquizzes />
-    </div>
+      </div>
 
-    <div>
-      <h3>TAKEN QUIZZES</h3>
-      <takenQuizzes />
-    </div>
+      <div ref="taken_quizzes">
+        <h3>TAKEN QUIZZES</h3>
+        <takenQuizzes />
+      </div>
 
-    <div>
-      <h3>MY SCORES</h3>
-      <myscores />
+      <div ref="myscores">
+        <h3>MY SCORES</h3>
+        <myscores />
+      </div>
     </div>
+    
   </div>
 </template>
 
@@ -147,4 +149,23 @@ h3 {
   padding-bottom: 4px;
   width: fit-content;
 }
+button {
+  display: inline-block;
+  margin: 5px 10px;
+  padding: 10px 16px;
+  background-color: #f4c784; 
+  color: #4a2e1e;
+  font-weight: 500;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.3s;
+  font-size: 16px;
+}
+
+button:hover {
+  background-color: #e3ac56;
+}
+
+
 </style>

@@ -1,8 +1,8 @@
 // Import the functions you need from the SDKs you need
 import { initializeApp } from "firebase/app";
 import { getAnalytics } from "firebase/analytics";
-import { getFirestore, doc, setDoc } from "firebase/firestore"
-import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, GoogleAuthProvider, signInWithPopup, updateProfile , setPersistence, browserSessionPersistence, sendPasswordResetEmail } from "firebase/auth";
+import { getFirestore, doc, setDoc, getDoc } from "firebase/firestore"
+import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, GoogleAuthProvider, signInWithPopup, updateProfile , setPersistence, browserLocalPersistence, sendPasswordResetEmail, onAuthStateChanged } from "firebase/auth";
 
 const firebaseConfig = {
   apiKey: "AIzaSyBUoOm7Eu2tWkK2UzpuoPnXZX3wFHfhQiY",
@@ -21,7 +21,24 @@ const auth = getAuth(app);
 const analytics = getAnalytics(app);
 const googleProvider = new GoogleAuthProvider();
 
-const registerWithEmailAndPassword = async (email, password) => {
+setPersistence(auth, browserLocalPersistence)
+  .then(() => {
+    console.log("Auth persistence set to Local");
+  })
+  .catch((error) => {
+    console.error("Error setting auth persistence:", error);
+  });
+
+onAuthStateChanged(auth, (user) => {
+    if (user) {
+      console.log("User is signed in:", user);
+      // You can fetch additional user data from Firestore here
+    } else {
+      console.log("No user is signed in");
+    }
+  });
+
+const registerWithEmailAndPassword = async (email, password,username) => {
   if (!email || !password) {
     console.error("Email and password must be provided.");
     throw new Error("Email and password are required.");
@@ -37,24 +54,6 @@ const registerWithEmailAndPassword = async (email, password) => {
     return user;
   } catch (error) {
     console.error("Error registering user:", error);
-    throw error;
-  }
-};
-
-setPersistence(auth, browserSessionPersistence)
-  .then(() => {
-    console.log("Auth persistence set to session");
-  })
-  .catch((error) => {
-    console.error("Error setting auth persistence:", error);
-  });
-
-const sendPasswordReset = async (email) => {
-  try {
-    await sendPasswordResetEmail(auth, email);
-    alert("Password reset email sent. Please check your inbox.");
-  } catch (error) {
-    console.error("Error sending password reset email:", error.message);
     throw error;
   }
 };
@@ -78,7 +77,23 @@ const loginWithEmailAndPassword = async (email, password) => {
 const signInWithGoogle = async () => {
   try {
     const result = await signInWithPopup(auth, googleProvider);
-    return result.user;
+    const user = result.user;
+    const userDocRef = doc(db, "users", user.uid);
+    const userDocSnapshot = await getDoc(userDocRef);
+    if (!userDocSnapshot.exists()) {
+      // If the user doesn't exist in Firestore, create a new document
+      await setDoc(userDocRef, {
+        name: user.displayName,
+        email: user.email,
+        username: user.email.split('@')[0],  // You can set the username to the part before '@' if needed
+        createdAt: new Date(),
+      });
+      console.log("User profile created in Firestore");
+    } else {
+      console.log("User profile already exists in Firestore");
+    }
+
+    return user;
   } catch (error) {
     console.error("Error signing in with Google:", error);
     throw error;
@@ -101,7 +116,7 @@ auth,
 registerWithEmailAndPassword,
 loginWithEmailAndPassword,
 signInWithGoogle,
-sendPasswordReset,
+sendPasswordResetEmail ,
 verifyResetCode,
 confirmReset
 };

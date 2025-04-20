@@ -25,7 +25,7 @@ export default {
   methods: {
     getMyScore(scores) {
       const userId = auth.currentUser?.uid;
-      const myEntry = scores.find(s => s.userId === userId);
+      const myEntry = scores.find(s => s.userid === userId);
       return myEntry ? myEntry.score : 'Not taken';
     },
     getHighScore(scores) {
@@ -48,16 +48,47 @@ export default {
 
     this.quizzes = querySnapshot.docs
       .map(doc => ({ id: doc.id, ...doc.data() }))
-      .filter(quiz => quiz.scores?.some(score => score.userId === userId));
+      .filter(quiz => quiz.scores?.some(score => score.userid === userId));
   }
 };
 </script>
 
 <style scoped>
+/* Style the score card container */
 .score-card {
-  padding: 10px;
-  margin-bottom: 12px;
-  border: 1px solid #ccc;
-  border-radius: 8px;
+padding: 20px;
+margin-bottom: 20px;
+border: 1px solid #ddd;
+border-radius: 10px;
+background-color:white;
+box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+font-family: Arial, sans-serif;
+}
+
+/* Style for quiz title */
+.quiz-title {
+font-size: 1.5em;
+color: #333;
+margin-bottom: 10px;
+}
+
+/* Style for individual score details */
+.score-detail {
+font-size: 1.1em;
+color: #555;
+margin: 5px 0;
+}
+
+/* Style for the case when no scores are available */
+.no-scores {
+font-size: 1.2em;
+color: #999;
+text-align: center;
+padding: 20px;
+}
+
+/* Add spacing between score details */
+.score-detail strong {
+color: #333;
 }
 </style>

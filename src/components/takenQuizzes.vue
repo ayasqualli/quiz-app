@@ -10,9 +10,9 @@
 </template>
 
 <script>
+import { onAuthStateChanged, getAuth } from 'firebase/auth';
 import { db } from '../firebase-config';
 import { collection, getDocs } from 'firebase/firestore';
-import { getAuth } from 'firebase/auth';
 
 export default {
   name: 'takenQuizzes',
@@ -21,18 +21,21 @@ export default {
       takenQuizzes: []
     };
   },
-  async mounted() {
+  mounted() {
     const auth = getAuth();
-    const user = auth.currentUser;
-    if (!user) return;
+    onAuthStateChanged(auth, async (user) => {
+      if (!user) return;
 
-    const querySnapshot = await getDocs(collection(db, 'quizzes'));
+      const querySnapshot = await getDocs(collection(db, 'quizzes'));
 
-    this.takenQuizzes = querySnapshot.docs
-      .map(doc => ({ id: doc.id, ...doc.data() }))
-      .filter(quiz =>
-        quiz.scores?.some(score => score.userId === user.uid)
-      );
+      this.takenQuizzes = querySnapshot.docs
+        .map(doc => ({ id: doc.id, ...doc.data() }))
+        .filter(quiz =>
+          Array.isArray(quiz.scores) &&
+          quiz.scores.some(score => score.userid === user.uid)
+        );
+    });
   }
 };
+
 </script>

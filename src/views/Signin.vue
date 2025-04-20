@@ -23,6 +23,18 @@
               </p>
             </div>
             <router-link to="/Forgot" class="forgot-password">Forgot Password?</router-link>
+            <br>
+            <div class="google-signin">
+              Sign up with :
+              <img
+                src="/google.jpeg"
+                width="40"
+                height="40"
+                alt="Sign in with Google"
+                @click="mysignInWithGoogle"
+                class="clickable-icon"
+              />
+            </div>
           </form>
         </div>
       </div>
@@ -31,7 +43,7 @@
 </template>
 
 <script>
-import { loginWithEmailAndPassword } from "../firebase-config";
+import { loginWithEmailAndPassword, signInWithGoogle } from "../firebase-config";
 
 export default {
   name: 'Signin',
@@ -57,7 +69,17 @@ export default {
           alert("Error: " + error.message);
         }
       }
-    }
+    },
+    async mysignInWithGoogle() {
+        try {
+          const result = await signInWithGoogle();
+          console.log("Google Sign-in successful:", result);
+          this.$router.push("/Home"); // or wherever you want to go
+        } catch (error) {
+          console.error("Google Sign-in error:", error);
+          alert("Google Sign-in failed: " + error.message);
+        }
+      }
   }
 };
 </script>
@@ -75,13 +97,21 @@ export default {
   width: 100%;
   max-width: 400px;
 }
-
+.google-signin {
+  margin-bottom: 10px;
+  font-size: 14px;
+  color: #7d5a44;
+}
 .flexy {
   display: flex;
   justify-content: center;
   align-items: center;
 }
-
+.clickable-icon {
+  cursor: pointer;
+  vertical-align: middle;
+  margin-left: 10px;
+}
 .form-container {
   background-color: #fffaf5; /* very light peach */
   padding: 30px;
