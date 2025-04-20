@@ -138,7 +138,7 @@ export default {
 
       try {
         const quizRef = await this.fetchQuestions(apiURL);
-        this.$router.push({ name: 'TakeQuiz', params: { id: quizRef.id } });
+        this.$router.push("/Home");
       } catch (error) {
         console.error("Error in submitForm:", error);
         this.error = error.message || "An error occurred while creating the quiz. Please try again.";
@@ -174,7 +174,8 @@ export default {
               category: this.formData.category,
               difficulty: this.formData.difficulty,
               type: this.formData.type,
-              questionCount: this.formData.questions
+              questionCount: this.formData.questions, 
+              userid: user.uid,
             });
             console.log("Quiz stored with ID: ", quizRef.id);
             return quizRef;

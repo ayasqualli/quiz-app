@@ -1,7 +1,7 @@
 <template>
   <div class="quiz-app">
-    <div class="home">
-      <button class="regenerate-btn" @click="$router.push('/')">
+    <div class="home" ref="results">
+      <button class="regenerate-btn" @click="$router.push('/Home')">
         <i class="fa fa-home"></i>
         <p>Back to home</p>
       </button>
@@ -10,11 +10,11 @@
     <main class="main">
       <div v-if="loading" class="loading">Loading questions...</div>
       <div v-else>
-        <div class="results" v-if="showResults" ref="results">
-          <h2>Quiz Complete!</h2>
-          <div class="score-summary">
-            <p>Your Final Score: <span class="final-score">{{ score }}</span></p>
-            <p>Total Questions: <span class="total-questions">{{ questions.length }}</span></p>
+        <div class="results-card" v-if="showResults">
+          <h2 class="results-title"> Quiz Complete!</h2>
+          <div class="score-highlight">
+            <p>Final Score</p>
+            <span class="big-score">{{ score }} / {{ questions.length }}</span>
           </div>
           <button class="restart-quiz" @click="restartQuiz">Try Again <i class="fa fa-refresh"></i></button>
         </div>
@@ -25,11 +25,7 @@
               <div id="number"><span>Question {{ index + 1 }}</span></div>
               <div id="timer" v-if="index === currentQuestionIndex">Time: <span>{{ timeLeft }}</span></div>
             </div>
-            <div class="properties">
-              <p>Type: <span>{{ question.type }}</span></p>
-              <p>Category: <span>{{ question.category }}</span></p>
-              <p>Difficulty: <span>{{ question.difficulty }}</span></p>
-            </div>
+            
             <h2>{{ question.question }}</h2>
             <div class="options">
               <div 
@@ -46,7 +42,7 @@
                 {{ answer }}
               </div>
             </div>
-            <button class="next" @click="nextQuestion(index)">
+            <button class="next" @click="nextQuestion(index)" :disabled="showResults">
               Next <i class="fa fa-arrow-right"></i>
             </button>
           </div>
@@ -119,9 +115,9 @@ export default {
           
           await updateDoc(quizRef, {
             scores: arrayUnion({
-              username: this.username,
+              userid: user.uid,
               score: this.score,
-              timestamp: new Date()
+              
             })
           });
           console.log('Score saved successfully');
@@ -141,9 +137,8 @@ export default {
       return question.answers || [...question.incorrect_answers, question.correct_answer];
     },
     selectAnswer(index, answer) {
-      if (this.timeLeft > 0 || index !== this.currentQuestionIndex) {
-        this.userAnswers[index] = answer;
-      }
+      if (index !== this.currentQuestionIndex || this.timeLeft <= 0) return;
+      this.userAnswers[index] = answer;
     },
     startTimer() {
       this.timeLeft = 30;
@@ -164,12 +159,14 @@ export default {
       }
     },
     async submitQuiz() {
+      clearInterval(this.timer);
       this.calculateScore();
       await this.saveScore();
       this.showResults = true;
       this.$nextTick(() => {
         this.scrollToResults();
       });
+
     },
     calculateScore() {
       this.score = this.questions.reduce((acc, question, index) => {
@@ -189,17 +186,9 @@ export default {
     },
     scrollToResults() {
       this.$refs.results.scrollIntoView({ behavior: 'smooth' });
-    }
-  },
-  mounted() {
-    this.fetchQuestions();
-  },
-  beforeUnmount() {
-    clearInterval(this.timer);
-  }
-};
+    },
 
-async function getQuizScores(quizId) {
+  async getQuizScores(quizId) {
   try {
     const quizDoc = await getDoc(doc(db, 'quizzes', quizId));
     if (quizDoc.exists()) {
@@ -214,7 +203,16 @@ async function getQuizScores(quizId) {
     console.error('Error fetching quiz scores:', error);
     return null;
   }
-}
+},
+  },
+  mounted() {
+    this.fetchQuestions();
+  },
+  beforeUnmount() {
+    clearInterval(this.timer);
+  }
+};
+
 </script>
 
 <style scoped>
@@ -307,6 +305,47 @@ h1 {
   .options {
     grid-template-columns: repeat(2, 1fr);
   }
+}
+
+.results-card {
+  text-align: center;
+  padding: 40px 30px;
+  margin: 40px auto;
+  background-color: #fff0ea;
+  border-radius: 16px;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.1);
+  max-width: 600px;
+}
+
+.results-title {
+  font-size: 2em;
+  margin-bottom: 20px;
+  color: #e67e22;
+}
+
+.score-highlight {
+  background-color: #fdebd0;
+  padding: 30px;
+  border-radius: 12px;
+  margin-bottom: 20px;
+}
+
+.score-highlight p {
+  margin: 0;
+  font-size: 1.2em;
+  color: #8b5e3c;
+}
+
+.big-score {
+  font-size: 3em;
+  font-weight: bold;
+  color: #27ae60;
+}
+
+.score-message {
+  font-size: 1.2em;
+  margin: 10px 0 30px;
+  color: #555;
 }
 
 .option {

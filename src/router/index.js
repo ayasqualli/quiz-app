@@ -9,6 +9,10 @@ import Signup from '../views/Signup.vue';
 import Signin from '../views/Signin.vue';
 import Quizzes from '../views/Quizzes.vue';
 import Profile from '../views/Profile.vue';
+import scores from '../components/myscores.vue';
+import takenquiz from '../components/takenQuizzes.vue';
+import ForgotPassword from '../views/ForgotPassword.vue'; 
+
 
 const routes = [
   { path: '/', name: 'Signin', component: Signin },
@@ -20,7 +24,14 @@ const routes = [
   {path: '/signup', name:'Signup',component: Signup},
   {path: '/Home', name:'Home',component: Home},
   {path: '/quizzes', name:'Quizzes',component: Quizzes},
-  {path: '/Profile', name:'Profile',component: Profile}
+  {path: '/Profile', name:'Profile',component: Profile},
+  {path: '/scores', name:'scores',component: scores},
+  {path: '/takenquiz', name:'takenquiz',component: takenquiz},
+  {
+    path: '/forgot',
+    name: 'ForgotPassword',
+    component: ForgotPassword
+  }
 ];
 
 const router = createRouter({
